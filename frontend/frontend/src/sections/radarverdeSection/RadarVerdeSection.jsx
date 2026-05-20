@@ -117,24 +117,28 @@ useEffect(() => {
 
       const anos = [...new Set(todos.map(r => Number(r.ano)))]
         .filter(Number.isFinite)
-        .sort((a, b) => b - a)   // mais recente primeiro
-        .slice(0, 3)             // últimos 3 anos
-        .sort((a, b) => a - b);  // UI crescente (2020 → 2022)
+        .sort((a, b) => b - a)
+        .slice(0, 3)
+        .sort((a, b) => a - b);
 
       setAnosDisponiveis((prev) => {
         const iguais = JSON.stringify(prev) === JSON.stringify(anos);
         return iguais ? prev : anos;
       });
 
+      // define apenas na primeira carga
+      if (anos.length > 0 && primeiraCargaAnos.current) {
+        setAnoSelecionado(anos[anos.length - 1]);
+        primeiraCargaAnos.current = false;
+      }
+
     } catch (e) {
       console.error("Erro ao carregar anos:", e);
     }
   }
 
-  // primeira carga
   carregarAnos();
 
-  // atualiza junto com backend (evita ficar obsoleto)
   intervalId = setInterval(carregarAnos, 10000);
 
   return () => clearInterval(intervalId);
@@ -206,7 +210,7 @@ useEffect(() => {
     setErroZonas(null);
 
     try {
-      const data = await fetchResiduos();
+const data = await fetchResiduos(anoSelecionado);
 
       const zonas = data.map((registro) => {
         const status = calcularStatus(
@@ -286,7 +290,7 @@ useEffect(() => {
     window.removeEventListener("residuosAtualizados", handleResiduosAtualizados);
   };
 
-}, [metaFiltro]);
+}, [metaFiltro, anoSelecionado]);
 
   const dadosAtivos = useMemo(() => dadosEstados, [dadosEstados]);
   const totalVolume = Math.round(dadosAtivos.reduce((acc, d) => acc + d.valor, 0));
@@ -490,7 +494,12 @@ useEffect(() => {
 
           {/* Mapa Visual */}
           <div className="zonas-mapa-wrapper">
-            <MapaBrasil anoInicial={2022} />
+            <MapaBrasil
+              ano={anoSelecionado}
+              setAno={setAnoSelecionado}
+              anos={anosDisponiveis}
+              meta={META_RECICLAGEM}
+            />
           </div>
         </div>
 
