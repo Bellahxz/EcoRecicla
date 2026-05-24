@@ -3,7 +3,7 @@
 **Integrantes:** Isabella Grorossi Muniz e Henrique Gustavo Lopes Ribeiro  
 **Disciplina:** Técnicas de Programação II 
 
-
+![Preview do projeto](https://i.ibb.co/2YLKRSPm/Screenshot-6-1.png)
 ---
 
 ## 1. Objetivo
